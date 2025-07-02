@@ -11,6 +11,11 @@ from typing import List, Optional
 import os
 from fastapi.middleware.cors import CORSMiddleware
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 SECRET_KEY = "StudyGaidStrongPassword366399"  # Change this to a strong secret in production
 ALGORITHM = "HS256"
@@ -222,7 +227,7 @@ def chat_endpoint(chat: ChatRequest, request: Request):
     # Add more context handling as needed
 
     payload = {
-        "model": "openai/gpt-3.5-turbo",  # You can change the model if needed
+        "model": "meta-llama/llama-4-scout:free",
         "messages": [
             {"role": "system", "content": "You are StudyBot, an AI assistant for StudyGuid TJ. You help users find majors, recommend universities in Tajikistan, and answer questions about studying in Tajikistan."},
             {"role": "user", "content": prompt}
@@ -233,7 +238,7 @@ def chat_endpoint(chat: ChatRequest, request: Request):
         "Content-Type": "application/json"
     }
     try:
-        response = requests.post(OPENROUTER_API_URL, json=payload, headers=headers, timeout=30)
+        response = requests.post(f"{OPENROUTER_BASE_URL}/chat/completions", json=payload, headers=headers, timeout=30)
         response.raise_for_status()
         data = response.json()
         ai_message = data["choices"][0]["message"]["content"]
