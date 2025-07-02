@@ -128,7 +128,7 @@ export default function SignInPage() {
         <motion.div className="max-w-md mx-auto" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-green-600 to-red-600 bg-clip-text text-transparent">
-              Sign In to StudyGaid TJ
+              Sign In to StudyGuid TJ
             </h1>
             <p className="text-gray-600">Choose your account type to continue</p>
           </div>

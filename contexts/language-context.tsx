@@ -23,7 +23,7 @@ const translations = {
     "nav.signIn": "Sign In",
 
     // Hero Section
-    "hero.title": "StudyGaid TJ",
+    "hero.title": "StudyGuid TJ",
     "hero.subtitle": "Discover Your Future in Tajikistan",
     "hero.description": "Find your perfect university and major in Tajikistan with AI guidance",
     "hero.findMajor": "Find My Major",
@@ -80,7 +80,7 @@ const translations = {
     "nav.signIn": "Войти",
 
     // Hero Section
-    "hero.title": "StudyGaid TJ",
+    "hero.title": "StudyGuid TJ",
     "hero.subtitle": "Откройте Свое Будущее в Таджикистане",
     "hero.description": "Найдите идеальный университет и специальность в Таджикистане с помощью ИИ",
     "hero.findMajor": "Найти Специальность",
@@ -138,7 +138,7 @@ const translations = {
     "nav.signIn": "Ворид шудан",
 
     // Hero Section
-    "hero.title": "StudyGaid TJ",
+    "hero.title": "StudyGuid TJ",
     "hero.subtitle": "Ояндаи Худро дар Тоҷикистон Кашф Кунед",
     "hero.description": "Донишгоҳ ва ихтисоси беҳтаринро дар Тоҷикистон бо роҳнамоии AI пайдо кунед",
     "hero.findMajor": "Ихтисоси Манро Ёбед",

@@ -1,6 +1,6 @@
 # StudyGuid Tj 🎓🌍
 
-StudyGaid Tj is an educational web platform designed to assist both local and international students in exploring universities, faculties, and academic programs across Tajikistan. It bridges students with institutions through a multilingual, interactive, and informative interface.
+StudyGuid TJ is an educational web platform designed to assist both local and international students in exploring universities, faculties, and academic programs across Tajikistan. It bridges students with institutions through a multilingual, interactive, and informative interface.
 
 ## 🌟 Key Features
 
@@ -32,7 +32,7 @@ StudyGaid Tj is an educational web platform designed to assist both local and in
 
 ## 🎯 Purpose
 
-StudyGaid Tj aims to:
+StudyGuid TJ aims to:
 
 - Empower students with accurate, centralized academic information.
 - Promote Tajikistan’s educational institutions to international audiences.

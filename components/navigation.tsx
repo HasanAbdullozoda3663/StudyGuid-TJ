@@ -64,7 +64,7 @@ export function Navigation() {
               <span className="text-white font-bold text-sm">SG</span>
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-green-600 to-red-600 bg-clip-text text-transparent">
-              StudyGaid TJ
+              StudyGuid TJ
             </span>
           </Link>
 

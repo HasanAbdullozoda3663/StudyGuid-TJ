@@ -15,7 +15,7 @@ interface Message {
 }
 
 const mockResponses = [
-  "Hi! I'm StudyBot, your StudyGaid TJ AI university assistant. How can I help you today?",
+  "Hi! I'm StudyBot, your StudyGuid TJ AI university assistant. How can I help you today?",
   "I can help you find the perfect major, explore universities, or answer questions about admissions!",
   "Based on your interests, I'd recommend looking into Computer Science or Engineering programs.",
   "Great question! Let me help you compare those universities...",
@@ -27,7 +27,7 @@ export function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hi! I'm StudyBot from StudyGaid TJ. Ask me anything about universities or majors.",
+      text: "Hi! I'm StudyBot from StudyGuid TJ. Ask me anything about universities or majors.",
       sender: "bot",
       timestamp: new Date(),
     },

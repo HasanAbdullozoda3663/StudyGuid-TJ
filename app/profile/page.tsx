@@ -451,7 +451,7 @@ export default function ProfilePage() {
                   <h3 className="text-xl font-semibold mb-4">Member Since</h3>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-purple-600 mb-2">{profileData.joinDate}</div>
-                    <p className="text-gray-600">Welcome to StudyGaid TJ!</p>
+                    <p className="text-gray-600">Welcome to StudyGuid TJ!</p>
                   </div>
                 </Card>
               </div>
