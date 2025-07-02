@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi import FastAPI, Depends, HTTPException, status, Request, Path
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
@@ -105,6 +105,8 @@ class UserCreate(BaseModel):
     password: str
     role: str
     name: str
+    location: str | None = None
+    description: str | None = None
 
 class UserOut(BaseModel):
     id: int
@@ -153,6 +155,13 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     # Set status based on role
     if user.role == "institution":
         status = "pending"
+        # Create University record
+        if not user.location or not user.description:
+            raise HTTPException(status_code=400, detail="Location and description are required for institutions.")
+        db_uni = University(name=user.name, location=user.location, description=user.description)
+        db.add(db_uni)
+        db.commit()
+        db.refresh(db_uni)
     else:
         status = "approved"
     db_user = User(email=user.email, password_hash=hashed_password, role=user.role, name=user.name, status=status)
@@ -250,4 +259,28 @@ def chat_endpoint(chat: ChatRequest, request: Request):
         ai_message = data["choices"][0]["message"]["content"]
         return {"response": ai_message}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}")
+
+@app.get("/admin/institutions/pending", response_model=List[UserOut])
+def list_pending_institutions(db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)):
+    return db.query(User).filter(User.role == "institution", User.status == "pending").all()
+
+@app.patch("/admin/institutions/{user_id}/approve", response_model=UserOut)
+def approve_institution(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)):
+    user = db.query(User).filter(User.id == user_id, User.role == "institution").first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    user.status = "approved"
+    db.commit()
+    db.refresh(user)
+    return user
+
+@app.patch("/admin/institutions/{user_id}/reject", response_model=UserOut)
+def reject_institution(user_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)):
+    user = db.query(User).filter(User.id == user_id, User.role == "institution").first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    user.status = "rejected"
+    db.commit()
+    db.refresh(user)
+    return user 
