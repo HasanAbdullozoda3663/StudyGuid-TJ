@@ -11,7 +11,7 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "StudyGaid TJ - Study in Tajikistan",
   description: "Discover your perfect university and major in Tajikistan with AI guidance",
-  generator: "v0.dev",
+  generator: "Abdullozoda Hasan Saduullo",
 }
 
 export default function RootLayout({
