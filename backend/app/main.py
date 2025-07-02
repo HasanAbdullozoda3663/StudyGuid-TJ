@@ -111,6 +111,7 @@ class UserOut(BaseModel):
     email: str
     role: str
     name: str
+    status: str
     class Config:
         orm_mode = True
 
@@ -149,7 +150,12 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = get_password_hash(user.password)
-    db_user = User(email=user.email, password_hash=hashed_password, role=user.role, name=user.name)
+    # Set status based on role
+    if user.role == "institution":
+        status = "pending"
+    else:
+        status = "approved"
+    db_user = User(email=user.email, password_hash=hashed_password, role=user.role, name=user.name, status=status)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
