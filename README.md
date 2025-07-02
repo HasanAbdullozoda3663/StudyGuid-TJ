@@ -1,4 +1,4 @@
-# StudyGaid Tj 🎓🌍
+# StudyGuid Tj 🎓🌍
 
 StudyGaid Tj is an educational web platform designed to assist both local and international students in exploring universities, faculties, and academic programs across Tajikistan. It bridges students with institutions through a multilingual, interactive, and informative interface.
 
@@ -17,7 +17,7 @@ StudyGaid Tj is an educational web platform designed to assist both local and in
 - React.js – User interface and component-based design
 - React Router – Client-side routing
 - Axios – HTTP client for API requests
-- Bootstrap / Tailwind CSS – UI styling and layout (if applicable)
+- Bootstrap / Tailwind CSS – UI styling and layout
 
 ### Backend
 - Django – Web framework for building APIs and managing backend logic
@@ -29,11 +29,6 @@ StudyGaid Tj is an educational web platform designed to assist both local and in
 ### AI & Smart Features
 - Natural Language Processing (NLP) – For chatbot interaction (e.g., with custom or integrated models)
 - Quiz Logic Engine – For recommending academic majors based on user responses
-
-### Multilingual Support
-- i18n / Django translation system – Enabling three-language support (Tajik, Russian, English)
-
----
 
 ## 🎯 Purpose
 
