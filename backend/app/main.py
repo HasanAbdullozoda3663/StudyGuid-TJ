@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 import os
 from fastapi.middleware.cors import CORSMiddleware
+import requests
 
 SECRET_KEY = "StudyGaidStrongPassword366399"  # Change this to a strong secret in production
 ALGORITHM = "HS256"
@@ -125,6 +126,13 @@ class UniversityOut(BaseModel):
     class Config:
         orm_mode = True
 
+class ChatRequest(BaseModel):
+    message: str
+    context: Optional[str] = None  # e.g., 'find_major', 'university_list', etc.
+
+class ChatResponse(BaseModel):
+    response: str
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the StudyGuid-TJ Backend!"}
@@ -197,4 +205,38 @@ def delete_university(university_id: int, db: Session = Depends(get_db), current
         raise HTTPException(status_code=404, detail="University not found")
     db.delete(db_uni)
     db.commit()
-    return {"detail": "University deleted"} 
+    return {"detail": "University deleted"}
+
+# Chat endpoint
+@app.post("/chat", response_model=ChatResponse)
+def chat_endpoint(chat: ChatRequest, request: Request):
+    if not OPENROUTER_API_KEY:
+        raise HTTPException(status_code=500, detail="OpenRouter API key not set.")
+
+    # Prepare the prompt for OpenRouter
+    prompt = chat.message
+    if chat.context == "find_major":
+        prompt = f"The user is looking for a major recommendation based on their interests: {chat.message}. Recommend a suitable major and explain why. Also, suggest universities in Tajikistan that offer this major."
+    elif chat.context == "university_list":
+        prompt = f"List universities in Tajikistan and provide a brief description for each."
+    # Add more context handling as needed
+
+    payload = {
+        "model": "openai/gpt-3.5-turbo",  # You can change the model if needed
+        "messages": [
+            {"role": "system", "content": "You are StudyBot, an AI assistant for StudyGuid TJ. You help users find majors, recommend universities in Tajikistan, and answer questions about studying in Tajikistan."},
+            {"role": "user", "content": prompt}
+        ]
+    }
+    headers = {
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    try:
+        response = requests.post(OPENROUTER_API_URL, json=payload, headers=headers, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        ai_message = data["choices"][0]["message"]["content"]
+        return {"response": ai_message}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI service error: {str(e)}") 

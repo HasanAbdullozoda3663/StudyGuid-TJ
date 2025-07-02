@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { MessageCircle, X, Send, Bot, User } from "lucide-react"
+import axios from "axios"
 
 interface Message {
   id: number
@@ -13,14 +14,6 @@ interface Message {
   sender: "user" | "bot"
   timestamp: Date
 }
-
-const mockResponses = [
-  "Hi! I'm StudyBot, your StudyGuid TJ AI university assistant. How can I help you today?",
-  "I can help you find the perfect major, explore universities, or answer questions about admissions!",
-  "Based on your interests, I'd recommend looking into Computer Science or Engineering programs.",
-  "Great question! Let me help you compare those universities...",
-  "Would you like me to suggest some universities that offer that major?",
-]
 
 export function ChatbotWidget() {
   const [isOpen, setIsOpen] = useState(false)
@@ -33,8 +26,9 @@ export function ChatbotWidget() {
     },
   ])
   const [inputValue, setInputValue] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!inputValue.trim()) return
 
     const userMessage: Message = {
@@ -46,17 +40,32 @@ export function ChatbotWidget() {
 
     setMessages((prev) => [...prev, userMessage])
     setInputValue("")
+    setLoading(true)
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      const res = await axios.post("/api/chat", {
+        message: userMessage.text,
+      })
       const botMessage: Message = {
         id: messages.length + 2,
-        text: mockResponses[Math.floor(Math.random() * mockResponses.length)],
+        text: res.data.response,
         sender: "bot",
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, botMessage])
-    }, 1000)
+    } catch (err) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: messages.length + 2,
+          text: "Sorry, I couldn't get a response. Please try again later.",
+          sender: "bot",
+          timestamp: new Date(),
+        },
+      ])
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -162,6 +171,7 @@ export function ChatbotWidget() {
                     onClick={sendMessage}
                     size="sm"
                     className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    disabled={loading}
                   >
                     <Send size={16} />
                   </Button>
