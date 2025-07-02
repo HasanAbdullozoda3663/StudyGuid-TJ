@@ -9,6 +9,7 @@ from app.models import Base, User, University, UserRole
 from pydantic import BaseModel
 from typing import List, Optional
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 SECRET_KEY = "StudyGaidStrongPassword366399"  # Change this to a strong secret in production
 ALGORITHM = "HS256"
@@ -20,6 +21,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # In production, specify your frontend URL
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 def get_db():
     db = SessionLocal()
