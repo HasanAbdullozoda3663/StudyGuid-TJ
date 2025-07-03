@@ -23,6 +23,7 @@ import {
   Globe,
 } from "lucide-react"
 import { useAuth } from "@/contexts/auth-context"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
 const systemStats = {
   totalUniversities: 25,
@@ -50,10 +51,61 @@ const recentActivities = [
 
 export default function AdminDashboard() {
   const { user } = useAuth()
+  const [selectedTab, setSelectedTab] = useState("dashboard")
   const [selectedApplication, setSelectedApplication] = useState<any>(null)
   const [applications, setApplications] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const [universities, setUniversities] = useState<any[]>([])
+  const [users, setUsers] = useState<any[]>([])
+
+  // Fetch universities
+  useEffect(() => {
+    if (selectedTab === "universities") {
+      const fetchUniversities = async () => {
+        setLoading(true)
+        setError("")
+        try {
+          const token = localStorage.getItem("token")
+          const res = await fetch("http://127.0.0.1:8000/admin/universities", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (!res.ok) throw new Error("Failed to fetch universities")
+          const data = await res.json()
+          setUniversities(data)
+        } catch (err: any) {
+          setError(err.message || "Error fetching universities")
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchUniversities()
+    }
+  }, [selectedTab])
+
+  // Fetch users
+  useEffect(() => {
+    if (selectedTab === "users") {
+      const fetchUsers = async () => {
+        setLoading(true)
+        setError("")
+        try {
+          const token = localStorage.getItem("token")
+          const res = await fetch("http://127.0.0.1:8000/admin/users", {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          if (!res.ok) throw new Error("Failed to fetch users")
+          const data = await res.json()
+          setUsers(data)
+        } catch (err: any) {
+          setError(err.message || "Error fetching users")
+        } finally {
+          setLoading(false)
+        }
+      }
+      fetchUsers()
+    }
+  }, [selectedTab])
 
   // Fetch pending institutions from backend
   useEffect(() => {
@@ -113,90 +165,223 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome Section */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="bg-gradient-to-r from-green-600 to-red-600 rounded-lg p-6 text-white">
-          <h1 className="text-3xl font-bold mb-2">Welcome to StudyGuide TJ Admin</h1>
-          <p className="text-green-100">Manage universities, applications, and system analytics</p>
-        </div>
-      </motion.div>
+      <Tabs value={selectedTab} onValueChange={setSelectedTab} className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+          <TabsTrigger value="universities">Universities</TabsTrigger>
+          <TabsTrigger value="applications">Applications</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="messages">Messages</TabsTrigger>
+          <TabsTrigger value="settings">Settings</TabsTrigger>
+        </TabsList>
 
-      {/* Stats Grid */}
-      <motion.div
-        className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-      >
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Universities</p>
-              <p className="text-3xl font-bold text-blue-600">{systemStats.totalUniversities}</p>
+        <TabsContent value="dashboard">
+          {/* Welcome Section */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+            <div className="bg-gradient-to-r from-green-600 to-red-600 rounded-lg p-6 text-white">
+              <h1 className="text-3xl font-bold mb-2">Welcome to StudyGuide TJ Admin</h1>
+              <p className="text-green-100">Manage universities, applications, and system analytics</p>
             </div>
-            <Building className="text-blue-500" size={40} />
-          </div>
-          <div className="flex items-center mt-2 text-sm">
-            <TrendingUp className="text-green-500 mr-1" size={16} />
-            <span className="text-green-600">+{systemStats.monthlyGrowth}% this month</span>
-          </div>
-        </Card>
+          </motion.div>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Total Students</p>
-              <p className="text-3xl font-bold text-green-600">{systemStats.totalStudents.toLocaleString()}</p>
+          {/* Stats Grid */}
+          <motion.div
+            className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Universities</p>
+                  <p className="text-3xl font-bold text-blue-600">{systemStats.totalUniversities}</p>
+                </div>
+                <Building className="text-blue-500" size={40} />
+              </div>
+              <div className="flex items-center mt-2 text-sm">
+                <TrendingUp className="text-green-500 mr-1" size={16} />
+                <span className="text-green-600">+{systemStats.monthlyGrowth}% this month</span>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Students</p>
+                  <p className="text-3xl font-bold text-green-600">{systemStats.totalStudents.toLocaleString()}</p>
+                </div>
+                <Users className="text-green-500" size={40} />
+              </div>
+              <div className="flex items-center mt-2 text-sm">
+                <UserCheck className="text-blue-500 mr-1" size={16} />
+                <span className="text-blue-600">{systemStats.activeUsers.toLocaleString()} active users</span>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Programs</p>
+                  <p className="text-3xl font-bold text-purple-600">{systemStats.totalPrograms}</p>
+                </div>
+                <BookOpen className="text-purple-500" size={40} />
+              </div>
+              <div className="flex items-center mt-2 text-sm">
+                <BarChart3 className="text-purple-500 mr-1" size={16} />
+                <span className="text-purple-600">Across all universities</span>
+              </div>
+            </Card>
+
+            <Card className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Pending Applications</p>
+                  <p className="text-3xl font-bold text-orange-600">{systemStats.pendingApplications}</p>
+                </div>
+                <Clock className="text-orange-500" size={40} />
+              </div>
+              <div className="flex items-center mt-2 text-sm">
+                <AlertCircle className="text-orange-500 mr-1" size={16} />
+                <span className="text-orange-600">Requires review</span>
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* Main Content Grid */}
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Pending Applications */}
+            <div className="lg:col-span-2">
+              <Card className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-xl font-semibold">Pending Applications</h2>
+                  <Badge variant="outline" className="text-orange-600 border-orange-300">
+                    {applications.length} Pending
+                  </Badge>
+                </div>
+
+                {loading ? (
+                  <div>Loading...</div>
+                ) : error ? (
+                  <div className="text-red-600">{error}</div>
+                ) : applications.length === 0 ? (
+                  <div>No pending institution applications.</div>
+                ) : (
+                  applications.map((app) => (
+                    <Card key={app.id} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                      <div>
+                        <div className="font-semibold text-lg">{app.name}</div>
+                        <div className="text-gray-600 text-sm">{app.email}</div>
+                        <div className="text-gray-600 text-sm flex items-center"><MapPin size={14} className="mr-1" />{app.location}</div>
+                        <div className="text-gray-600 text-sm mt-1">{app.description}</div>
+                      </div>
+                      <div className="flex space-x-2 mt-4 md:mt-0">
+                        <Button onClick={() => handleApprove(app.id)} className="bg-green-600 hover:bg-green-700 text-white"><CheckCircle size={16} className="mr-1" />Approve</Button>
+                        <Button onClick={() => handleReject(app.id)} className="bg-red-600 hover:bg-red-700 text-white"><XCircle size={16} className="mr-1" />Reject</Button>
+                      </div>
+                    </Card>
+                  ))
+                )}
+              </Card>
             </div>
-            <Users className="text-green-500" size={40} />
-          </div>
-          <div className="flex items-center mt-2 text-sm">
-            <UserCheck className="text-blue-500 mr-1" size={16} />
-            <span className="text-blue-600">{systemStats.activeUsers.toLocaleString()} active users</span>
-          </div>
-        </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
+            {/* Recent Activity */}
             <div>
-              <p className="text-sm text-gray-600">Total Programs</p>
-              <p className="text-3xl font-bold text-purple-600">{systemStats.totalPrograms}</p>
-            </div>
-            <BookOpen className="text-purple-500" size={40} />
-          </div>
-          <div className="flex items-center mt-2 text-sm">
-            <BarChart3 className="text-purple-500 mr-1" size={16} />
-            <span className="text-purple-600">Across all universities</span>
-          </div>
-        </Card>
+              <Card className="p-6">
+                <h2 className="text-xl font-semibold mb-6">Recent Activity</h2>
+                <div className="space-y-4">
+                  {recentActivities.map((activity) => (
+                    <div key={activity.id} className="flex items-start space-x-3">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          activity.type === "application"
+                            ? "bg-blue-100"
+                            : activity.type === "approval"
+                              ? "bg-green-100"
+                              : activity.type === "user"
+                                ? "bg-purple-100"
+                                : "bg-gray-100"
+                        }`}
+                      >
+                        {activity.type === "application" && <Building className="text-blue-600" size={16} />}
+                        {activity.type === "approval" && <CheckCircle className="text-green-600" size={16} />}
+                        {activity.type === "user" && <Users className="text-purple-600" size={16} />}
+                        {activity.type === "system" && <Globe className="text-gray-600" size={16} />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-gray-800">{activity.action}</p>
+                        <p className="text-xs text-gray-600">{activity.details}</p>
+                        <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">Pending Applications</p>
-              <p className="text-3xl font-bold text-orange-600">{systemStats.pendingApplications}</p>
+              {/* Quick Stats */}
+              <Card className="p-6 mt-6">
+                <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Total Applications</span>
+                    <span className="font-semibold">{systemStats.totalApplications}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Approved This Month</span>
+                    <span className="font-semibold text-green-600">{systemStats.approvedThisMonth}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Active Universities</span>
+                    <span className="font-semibold">{systemStats.totalUniversities}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">System Uptime</span>
+                    <span className="font-semibold text-green-600">99.9%</span>
+                  </div>
+                </div>
+              </Card>
             </div>
-            <Clock className="text-orange-500" size={40} />
           </div>
-          <div className="flex items-center mt-2 text-sm">
-            <AlertCircle className="text-orange-500 mr-1" size={16} />
-            <span className="text-orange-600">Requires review</span>
-          </div>
-        </Card>
-      </motion.div>
+        </TabsContent>
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Pending Applications */}
-        <div className="lg:col-span-2">
+        <TabsContent value="universities">
           <Card className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">Pending Applications</h2>
-              <Badge variant="outline" className="text-orange-600 border-orange-300">
-                {applications.length} Pending
-              </Badge>
-            </div>
+            <h2 className="text-xl font-semibold mb-6">All Universities</h2>
+            {loading ? (
+              <div>Loading...</div>
+            ) : error ? (
+              <div className="text-red-600">{error}</div>
+            ) : universities.length === 0 ? (
+              <div>No universities found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 text-left">Name</th>
+                      <th className="px-4 py-2 text-left">Location</th>
+                      <th className="px-4 py-2 text-left">Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {universities.map((uni) => (
+                      <tr key={uni.id} className="border-b">
+                        <td className="px-4 py-2">{uni.name}</td>
+                        <td className="px-4 py-2">{uni.location}</td>
+                        <td className="px-4 py-2">{uni.description}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </Card>
+        </TabsContent>
 
+        <TabsContent value="applications">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Pending Applications</h2>
             {loading ? (
               <div>Loading...</div>
             ) : error ? (
@@ -220,65 +405,65 @@ export default function AdminDashboard() {
               ))
             )}
           </Card>
-        </div>
+        </TabsContent>
 
-        {/* Recent Activity */}
-        <div>
+        <TabsContent value="users">
           <Card className="p-6">
-            <h2 className="text-xl font-semibold mb-6">Recent Activity</h2>
-            <div className="space-y-4">
-              {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-start space-x-3">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      activity.type === "application"
-                        ? "bg-blue-100"
-                        : activity.type === "approval"
-                          ? "bg-green-100"
-                          : activity.type === "user"
-                            ? "bg-purple-100"
-                            : "bg-gray-100"
-                    }`}
-                  >
-                    {activity.type === "application" && <Building className="text-blue-600" size={16} />}
-                    {activity.type === "approval" && <CheckCircle className="text-green-600" size={16} />}
-                    {activity.type === "user" && <Users className="text-purple-600" size={16} />}
-                    {activity.type === "system" && <Globe className="text-gray-600" size={16} />}
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">{activity.action}</p>
-                    <p className="text-xs text-gray-600">{activity.details}</p>
-                    <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <h2 className="text-xl font-semibold mb-6">All Users</h2>
+            {loading ? (
+              <div>Loading...</div>
+            ) : error ? (
+              <div className="text-red-600">{error}</div>
+            ) : users.length === 0 ? (
+              <div>No users found.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2 text-left">Name</th>
+                      <th className="px-4 py-2 text-left">Email</th>
+                      <th className="px-4 py-2 text-left">Role</th>
+                      <th className="px-4 py-2 text-left">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id} className="border-b">
+                        <td className="px-4 py-2">{u.name}</td>
+                        <td className="px-4 py-2">{u.email}</td>
+                        <td className="px-4 py-2">{u.role}</td>
+                        <td className="px-4 py-2">{u.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </Card>
+        </TabsContent>
 
-          {/* Quick Stats */}
-          <Card className="p-6 mt-6">
-            <h2 className="text-xl font-semibold mb-4">Quick Stats</h2>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Total Applications</span>
-                <span className="font-semibold">{systemStats.totalApplications}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Approved This Month</span>
-                <span className="font-semibold text-green-600">{systemStats.approvedThisMonth}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Active Universities</span>
-                <span className="font-semibold">{systemStats.totalUniversities}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">System Uptime</span>
-                <span className="font-semibold text-green-600">99.9%</span>
-              </div>
-            </div>
+        <TabsContent value="analytics">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Analytics</h2>
+            <div>Analytics coming soon...</div>
           </Card>
-        </div>
-      </div>
+        </TabsContent>
+
+        <TabsContent value="messages">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Messages</h2>
+            <div>No messages yet.</div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="settings">
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Settings</h2>
+            <div>Settings coming soon...</div>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Application Detail Modal */}
       {selectedApplication && (

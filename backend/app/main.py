@@ -283,4 +283,12 @@ def reject_institution(user_id: int, db: Session = Depends(get_db), current_user
     user.status = "rejected"
     db.commit()
     db.refresh(user)
-    return user 
+    return user
+
+@app.get("/admin/universities", response_model=List[UniversityOut])
+def list_universities_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)):
+    return db.query(University).all()
+
+@app.get("/admin/users", response_model=List[UserOut])
+def list_users_admin(db: Session = Depends(get_db), current_user: User = Depends(get_current_admin_user)):
+    return db.query(User).all() 
