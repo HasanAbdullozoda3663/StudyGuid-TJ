@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Shield className="text-white" size={20} />
               </div>
               <div>
-                <h2 className="font-semibold text-lg">StudyGuid TJ</h2>
+                <h2 className="font-semibold text-lg">StudyGuide TJ</h2>
                 <p className="text-xs text-gray-500">Admin Panel</p>
               </div>
             </div>

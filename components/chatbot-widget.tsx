@@ -20,7 +20,7 @@ export function ChatbotWidget() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
-      text: "Hi! I'm StudyBot from StudyGuid TJ. Ask me anything about universities or majors.",
+      text: "Hi! I'm StudyBot from StudyGuide TJ. Ask me anything about universities or majors.",
       sender: "bot",
       timestamp: new Date(),
     },

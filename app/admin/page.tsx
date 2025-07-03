@@ -116,7 +116,7 @@ export default function AdminDashboard() {
       {/* Welcome Section */}
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="bg-gradient-to-r from-green-600 to-red-600 rounded-lg p-6 text-white">
-          <h1 className="text-3xl font-bold mb-2">Welcome to StudyGuid TJ Admin</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome to StudyGuide TJ Admin</h1>
           <p className="text-green-100">Manage universities, applications, and system analytics</p>
         </div>
       </motion.div>

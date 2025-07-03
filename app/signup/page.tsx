@@ -57,7 +57,7 @@ export default function SignUpPage() {
             <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-green-600 to-red-600 bg-clip-text text-transparent">
               {t("nav.signUp")}
             </h1>
-            <p className="text-gray-600">Join StudyGuid TJ community</p>
+            <p className="text-gray-600">Join StudyGuide TJ community</p>
           </div>
 
           {/* User Type Selection */}

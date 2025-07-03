@@ -244,7 +244,7 @@ def chat_endpoint(chat: ChatRequest, request: Request):
     payload = {
         "model": "meta-llama/llama-4-scout:free",
         "messages": [
-            {"role": "system", "content": "You are StudyBot, an AI assistant for StudyGuid TJ. You help users find majors, recommend universities in Tajikistan, and answer questions about studying in Tajikistan."},
+            {"role": "system", "content": "You are StudyBot, an AI assistant for StudyGuide TJ. You help users find majors, recommend universities in Tajikistan, and answer questions about studying in Tajikistan."},
             {"role": "user", "content": prompt}
         ]
     }
