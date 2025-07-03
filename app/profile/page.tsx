@@ -31,118 +31,120 @@ import {
   Shield,
 } from "lucide-react"
 
-const mockProfile = {
-  name: "Alex Johnson",
-  email: "alex.johnson@email.com",
-  phone: "+992 90 123-45-67",
-  location: "Dushanbe, Tajikistan",
-  dateOfBirth: "1998-05-15",
-  joinDate: "March 2024",
-  bio: "Aspiring computer science student passionate about technology and innovation. Looking to study at top universities in Tajikistan.",
-  interests: ["Technology", "Programming", "AI", "Mathematics"],
-  completedAssessments: 3,
-  profileImage: "/placeholder.svg?height=150&width=150",
-  savedUniversities: [
-    {
-      id: 1,
-      name: "Tajik Technical University",
-      country: "Tajikistan",
-      city: "Dushanbe",
-      major: "Computer Science",
-      savedDate: "2024-03-15",
-      status: "Applied",
-      image: "/placeholder.svg?height=100&width=150",
-    },
-    {
-      id: 2,
-      name: "Russian-Tajik University",
-      country: "Tajikistan",
-      city: "Dushanbe",
-      major: "Information Technology",
-      savedDate: "2024-03-10",
-      status: "Interested",
-      image: "/placeholder.svg?height=100&width=150",
-    },
-    {
-      id: 3,
-      name: "Tajik National University",
-      country: "Tajikistan",
-      city: "Dushanbe",
-      major: "Mathematics",
-      savedDate: "2024-03-08",
-      status: "Considering",
-      image: "/placeholder.svg?height=100&width=150",
-    },
-  ],
-  favoriteMajors: [
-    {
-      id: 1,
-      name: "Computer Science",
-      confidence: 92,
-      lastUpdated: "2024-03-15",
-      category: "Technology",
-      universities: 8,
-    },
-    {
-      id: 2,
-      name: "Information Technology",
-      confidence: 87,
-      lastUpdated: "2024-03-15",
-      category: "Technology",
-      universities: 6,
-    },
-    {
-      id: 3,
-      name: "Mathematics",
-      confidence: 81,
-      lastUpdated: "2024-03-15",
-      category: "Sciences",
-      universities: 9,
-    },
-  ],
-  recentActivity: [
-    {
-      id: 1,
-      action: "Completed Major Assessment",
-      date: "2024-03-15",
-      details: "Discovered 3 new major recommendations",
-      type: "assessment",
-    },
-    {
-      id: 2,
-      action: "Saved University",
-      date: "2024-03-15",
-      details: "Added Tajik Technical University to favorites",
-      type: "university",
-    },
-    {
-      id: 3,
-      action: "Compared Majors",
-      date: "2024-03-14",
-      details: "Computer Science vs Information Technology",
-      type: "comparison",
-    },
-    {
-      id: 4,
-      action: "Updated Profile",
-      date: "2024-03-13",
-      details: "Added interests and bio information",
-      type: "profile",
-    },
-  ],
-  achievements: [
-    { name: "First Assessment", description: "Completed your first major assessment", date: "2024-03-01" },
-    { name: "University Explorer", description: "Saved 3 universities to favorites", date: "2024-03-10" },
-    { name: "Active User", description: "Used the platform for 30 days", date: "2024-03-15" },
-  ],
-}
-
 export default function ProfilePage() {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState("overview")
   const [isEditing, setIsEditing] = useState(false)
-  const [profileData, setProfileData] = useState(mockProfile)
-  const [editData, setEditData] = useState(mockProfile)
+  
+  // Use actual user data instead of mock data
+  const userProfile = {
+    name: user?.name || "User",
+    email: user?.email || "user@example.com",
+    phone: "+992 90 123-45-67", // Keep some default data for now
+    location: "Dushanbe, Tajikistan",
+    dateOfBirth: "1998-05-15",
+    joinDate: "March 2024",
+    bio: "Aspiring computer science student passionate about technology and innovation. Looking to study at top universities in Tajikistan.",
+    interests: ["Technology", "Programming", "AI", "Mathematics"],
+    completedAssessments: 3,
+    profileImage: "/placeholder.svg?height=150&width=150",
+    savedUniversities: [
+      {
+        id: 1,
+        name: "Tajik Technical University",
+        country: "Tajikistan",
+        city: "Dushanbe",
+        major: "Computer Science",
+        savedDate: "2024-03-15",
+        status: "Applied",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 2,
+        name: "Russian-Tajik University",
+        country: "Tajikistan",
+        city: "Dushanbe",
+        major: "Information Technology",
+        savedDate: "2024-03-10",
+        status: "Interested",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+      {
+        id: 3,
+        name: "Tajik National University",
+        country: "Tajikistan",
+        city: "Dushanbe",
+        major: "Mathematics",
+        savedDate: "2024-03-08",
+        status: "Considering",
+        image: "/placeholder.svg?height=100&width=150",
+      },
+    ],
+    favoriteMajors: [
+      {
+        id: 1,
+        name: "Computer Science",
+        confidence: 92,
+        lastUpdated: "2024-03-15",
+        category: "Technology",
+        universities: 8,
+      },
+      {
+        id: 2,
+        name: "Information Technology",
+        confidence: 87,
+        lastUpdated: "2024-03-15",
+        category: "Technology",
+        universities: 6,
+      },
+      {
+        id: 3,
+        name: "Mathematics",
+        confidence: 81,
+        lastUpdated: "2024-03-15",
+        category: "Sciences",
+        universities: 9,
+      },
+    ],
+    recentActivity: [
+      {
+        id: 1,
+        action: "Completed Major Assessment",
+        date: "2024-03-15",
+        details: "Discovered 3 new major recommendations",
+        type: "assessment",
+      },
+      {
+        id: 2,
+        action: "Saved University",
+        date: "2024-03-15",
+        details: "Added Tajik Technical University to favorites",
+        type: "university",
+      },
+      {
+        id: 3,
+        action: "Compared Majors",
+        date: "2024-03-14",
+        details: "Computer Science vs Information Technology",
+        type: "comparison",
+      },
+      {
+        id: 4,
+        action: "Updated Profile",
+        date: "2024-03-13",
+        details: "Added interests and bio information",
+        type: "profile",
+      },
+    ],
+    achievements: [
+      { name: "First Assessment", description: "Completed your first major assessment", date: "2024-03-01" },
+      { name: "University Explorer", description: "Saved 3 universities to favorites", date: "2024-03-10" },
+      { name: "Active User", description: "Used the platform for 30 days", date: "2024-03-15" },
+    ],
+  }
+  
+  const [profileData, setProfileData] = useState(userProfile)
+  const [editData, setEditData] = useState(userProfile)
 
   const tabs = [
     { id: "overview", label: "Overview", icon: User },

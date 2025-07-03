@@ -18,10 +18,11 @@ import { useRouter } from "next/navigation"
 
 export default function SignInPage() {
   const { t } = useLanguage()
-  const { signIn } = useAuth()
+  const { login } = useAuth()
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState("")
 
   // Student login form
   const [studentForm, setStudentForm] = useState({
@@ -44,25 +45,17 @@ export default function SignInPage() {
   const handleStudentLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
     try {
-      // Mock authentication - replace with real auth
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const mockUser = {
-        id: "student_1",
-        name: "Ahmad Rahimov",
-        email: studentForm.email,
-        type: "student" as const,
-        avatar: "/placeholder-user.jpg",
-        favorites: [],
-        applications: [],
+      const userData = await login(studentForm.email, studentForm.password)
+      if (userData.role === "student") {
+        router.push("/profile")
+      } else {
+        setError("Invalid account type. Please use the correct login tab.")
       }
-
-      signIn(mockUser)
-      router.push("/profile")
     } catch (error) {
-      alert("Login failed. Please try again.")
+      setError("Login failed. Please check your credentials.")
     } finally {
       setIsLoading(false)
     }
@@ -71,24 +64,23 @@ export default function SignInPage() {
   const handleInstitutionLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const mockInstitution = {
-        id: "inst_1",
-        name: "Tajik Technical University",
-        email: institutionForm.email,
-        type: "institution" as const,
-        avatar: "/placeholder-logo.png",
-        favorites: [],
-        applications: [],
+      const userData = await login(institutionForm.email, institutionForm.password)
+      if (userData.role === "institution") {
+        if (userData.status === "pending") {
+          setError("Your account is pending approval. Please contact the administrator.")
+        } else if (userData.status === "rejected") {
+          setError("Your account has been rejected. Please contact the administrator.")
+        } else {
+          router.push("/institution/dashboard")
+        }
+      } else {
+        setError("Invalid account type. Please use the correct login tab.")
       }
-
-      signIn(mockInstitution)
-      router.push("/institution/dashboard")
     } catch (error) {
-      alert("Login failed. Please try again.")
+      setError("Login failed. Please check your credentials.")
     } finally {
       setIsLoading(false)
     }
@@ -97,24 +89,17 @@ export default function SignInPage() {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError("")
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const mockAdmin = {
-        id: "admin_1",
-        name: "System Administrator",
-        email: adminForm.email,
-        type: "admin" as const,
-        avatar: "/placeholder-user.jpg",
-        favorites: [],
-        applications: [],
+      const userData = await login(adminForm.email, adminForm.password)
+      if (userData.role === "admin") {
+        router.push("/admin")
+      } else {
+        setError("Invalid account type. Please use the correct login tab.")
       }
-
-      signIn(mockAdmin)
-      router.push("/admin")
     } catch (error) {
-      alert("Login failed. Please try again.")
+      setError("Login failed. Please check your credentials.")
     } finally {
       setIsLoading(false)
     }
@@ -152,6 +137,11 @@ export default function SignInPage() {
 
               <TabsContent value="student" className="mt-6">
                 <form onSubmit={handleStudentLogin} className="space-y-4">
+                  {error && (
+                    <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                      {error}
+                    </div>
+                  )}
                   <div>
                     <Label htmlFor="student-email">Email</Label>
                     <div className="relative">
@@ -199,12 +189,17 @@ export default function SignInPage() {
                     {isLoading ? "Signing In..." : "Sign In as Student"}
                   </Button>
 
-                  <div className="text-center text-sm text-gray-600">Demo credentials: any email and password</div>
+                  <div className="text-center text-sm text-gray-600">Use your registered student credentials</div>
                 </form>
               </TabsContent>
 
               <TabsContent value="institution" className="mt-6">
                 <form onSubmit={handleInstitutionLogin} className="space-y-4">
+                  {error && (
+                    <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                      {error}
+                    </div>
+                  )}
                   <div>
                     <Label htmlFor="institution-email">Institution Email</Label>
                     <div className="relative">
@@ -252,12 +247,17 @@ export default function SignInPage() {
                     {isLoading ? "Signing In..." : "Sign In as Institution"}
                   </Button>
 
-                  <div className="text-center text-sm text-gray-600">Demo credentials: any email and password</div>
+                  <div className="text-center text-sm text-gray-600">Use your approved institution credentials</div>
                 </form>
               </TabsContent>
 
               <TabsContent value="admin" className="mt-6">
                 <form onSubmit={handleAdminLogin} className="space-y-4">
+                  {error && (
+                    <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                      {error}
+                    </div>
+                  )}
                   <div>
                     <Label htmlFor="admin-email">Admin Email</Label>
                     <div className="relative">
@@ -305,7 +305,7 @@ export default function SignInPage() {
                     {isLoading ? "Signing In..." : "Sign In as Admin"}
                   </Button>
 
-                  <div className="text-center text-sm text-gray-600">Demo credentials: any email and password</div>
+                  <div className="text-center text-sm text-gray-600">Use your admin credentials</div>
                 </form>
               </TabsContent>
             </Tabs>

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -22,52 +22,7 @@ import {
   AlertCircle,
   Globe,
 } from "lucide-react"
-
-const pendingApplications = [
-  {
-    id: "1",
-    universityName: "International University of Tajikistan",
-    email: "admin@iut.tj",
-    location: "Dushanbe",
-    description: "A new international university focusing on modern education and research in Central Asia.",
-    submittedDate: "2024-01-15",
-    status: "pending",
-    contactPerson: "Dr. Ahmad Rahimov",
-    phone: "+992 37 234-56-78",
-    website: "www.iut.tj",
-    programs: ["Computer Science", "Business Administration", "International Relations"],
-    expectedStudents: 2000,
-  },
-  {
-    id: "2",
-    universityName: "Pamir Institute of Technology",
-    email: "info@pit.tj",
-    location: "Khorog",
-    description:
-      "Specialized technical institute serving the Gorno-Badakhshan region with focus on engineering and technology.",
-    submittedDate: "2024-01-12",
-    status: "pending",
-    contactPerson: "Prof. Gulnora Nazarova",
-    phone: "+992 35 222-33-44",
-    website: "www.pit.tj",
-    programs: ["Civil Engineering", "Electrical Engineering", "Computer Engineering"],
-    expectedStudents: 800,
-  },
-  {
-    id: "3",
-    universityName: "Tajik-Chinese University",
-    email: "contact@tcu.tj",
-    location: "Dushanbe",
-    description: "Joint educational institution promoting Chinese-Tajik educational cooperation and cultural exchange.",
-    submittedDate: "2024-01-10",
-    status: "pending",
-    contactPerson: "Dr. Li Wei",
-    phone: "+992 37 245-67-89",
-    website: "www.tcu.tj",
-    programs: ["Chinese Language", "Economics", "International Trade"],
-    expectedStudents: 1500,
-  },
-]
+import { useAuth } from "@/contexts/auth-context"
 
 const systemStats = {
   totalUniversities: 25,
@@ -94,17 +49,62 @@ const recentActivities = [
 ]
 
 export default function AdminDashboard() {
+  const { user } = useAuth()
   const [selectedApplication, setSelectedApplication] = useState<any>(null)
-  const [applications, setApplications] = useState(pendingApplications)
+  const [applications, setApplications] = useState<any[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
 
-  const handleApprove = (applicationId: string) => {
-    setApplications(applications.filter((app) => app.id !== applicationId))
-    alert("University application approved successfully!")
+  // Fetch pending institutions from backend
+  useEffect(() => {
+    const fetchPending = async () => {
+      setLoading(true)
+      setError("")
+      try {
+        const token = localStorage.getItem("token")
+        const res = await fetch("http://127.0.0.1:8000/admin/institutions/pending", {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (!res.ok) throw new Error("Failed to fetch pending institutions")
+        const data = await res.json()
+        setApplications(data)
+      } catch (err: any) {
+        setError(err.message || "Error fetching data")
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPending()
+  }, [])
+
+  const handleApprove = async (userId: number) => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch(`http://127.0.0.1:8000/admin/institutions/${userId}/approve`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error("Failed to approve institution")
+      setApplications(applications.filter((app) => app.id !== userId))
+      alert("University application approved successfully!")
+    } catch (err: any) {
+      alert(err.message || "Error approving institution")
+    }
   }
 
-  const handleReject = (applicationId: string) => {
-    setApplications(applications.filter((app) => app.id !== applicationId))
-    alert("University application rejected.")
+  const handleReject = async (userId: number) => {
+    try {
+      const token = localStorage.getItem("token")
+      const res = await fetch(`http://127.0.0.1:8000/admin/institutions/${userId}/reject`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      if (!res.ok) throw new Error("Failed to reject institution")
+      setApplications(applications.filter((app) => app.id !== userId))
+      alert("University application rejected.")
+    } catch (err: any) {
+      alert(err.message || "Error rejecting institution")
+    }
   }
 
   const sendMessage = (email: string) => {
@@ -197,73 +197,27 @@ export default function AdminDashboard() {
               </Badge>
             </div>
 
-            <div className="space-y-4">
-              {applications.slice(0, 3).map((application) => (
-                <motion.div
-                  key={application.id}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                  whileHover={{ scale: 1.01 }}
-                >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <h3 className="font-semibold text-gray-800">{application.universityName}</h3>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600 mt-1">
-                        <MapPin size={14} />
-                        <span>{application.location}</span>
-                        <Calendar size={14} className="ml-2" />
-                        <span>{application.submittedDate}</span>
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="text-orange-600">
-                      Pending
-                    </Badge>
+            {loading ? (
+              <div>Loading...</div>
+            ) : error ? (
+              <div className="text-red-600">{error}</div>
+            ) : applications.length === 0 ? (
+              <div>No pending institution applications.</div>
+            ) : (
+              applications.map((app) => (
+                <Card key={app.id} className="p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <div className="font-semibold text-lg">{app.name}</div>
+                    <div className="text-gray-600 text-sm">{app.email}</div>
+                    <div className="text-gray-600 text-sm flex items-center"><MapPin size={14} className="mr-1" />{app.location}</div>
+                    <div className="text-gray-600 text-sm mt-1">{app.description}</div>
                   </div>
-
-                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">{application.description}</p>
-
-                  <div className="flex justify-between items-center">
-                    <div className="flex space-x-2">
-                      {application.programs.slice(0, 2).map((program, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          {program}
-                        </Badge>
-                      ))}
-                      {application.programs.length > 2 && (
-                        <Badge variant="outline" className="text-xs">
-                          +{application.programs.length - 2}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div className="flex space-x-2">
-                      <Button size="sm" variant="outline" onClick={() => setSelectedApplication(application)}>
-                        <Eye size={14} />
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={() => sendMessage(application.email)}>
-                        <Mail size={14} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                        onClick={() => handleApprove(application.id)}
-                      >
-                        <CheckCircle size={14} />
-                      </Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleReject(application.id)}>
-                        <XCircle size={14} />
-                      </Button>
-                    </div>
+                  <div className="flex space-x-2 mt-4 md:mt-0">
+                    <Button onClick={() => handleApprove(app.id)} className="bg-green-600 hover:bg-green-700 text-white"><CheckCircle size={16} className="mr-1" />Approve</Button>
+                    <Button onClick={() => handleReject(app.id)} className="bg-red-600 hover:bg-red-700 text-white"><XCircle size={16} className="mr-1" />Reject</Button>
                   </div>
-                </motion.div>
-              ))}
-            </div>
-
-            {applications.length === 0 && (
-              <div className="text-center py-8">
-                <CheckCircle className="mx-auto text-green-500 mb-4" size={48} />
-                <h3 className="text-lg font-semibold text-gray-600 mb-2">All Caught Up!</h3>
-                <p className="text-gray-500">No pending applications at the moment.</p>
-              </div>
+                </Card>
+              ))
             )}
           </Card>
         </div>
