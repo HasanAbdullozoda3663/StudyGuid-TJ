@@ -20,8 +20,7 @@ StudyGuid TJ is an educational web platform designed to assist both local and in
 - Bootstrap / Tailwind CSS – UI styling and layout
 
 ### Backend
-- Django – Web framework for building APIs and managing backend logic
-- Django REST Framework (DRF) – Creating RESTful API endpoints
+- Fast API used for the backend to handle the speed and effectiveness
 
 ### Database
 - MySQL – Relational database for storing user, quiz, and university data
